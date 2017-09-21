@@ -72,7 +72,7 @@ depends on the number of feature maps, not on the size of :math:`X`.
 Then, if :math:`Y` is another image *of any size*, we define the
 distance of style at layer :math:`L` as follow:
 
-.. math:: 
+.. math::
 
     D_S^L(X,Y) = \|G_{XL} - G_{YL}\|^2 = \sum_{k,l} (F_{XL}(k,l) - F_{YL}(k,l))^2
 
@@ -97,7 +97,7 @@ descent over :math:`X`:
 Ok. That's enough with maths. If you want to go deeper (how to compute
 the gradients) **we encourage you to read the original paper** by Leon
 A. Gatys and AL, where everything is much better and much clearer
-explained. 
+explained.
 
 For our implementation in PyTorch, we already have everything
 we need: indeed, with PyTorch, all the gradients are automatically and
@@ -230,6 +230,7 @@ plt.ion()
 def imshow(tensor, title=None):
     image = tensor.clone().cpu()  # we clone the tensor to not do changes on it
     image = image.view(3, imsize, imsize)  # remove the fake batch dimension
+    image = image.clamp_(0,1) #clamp image to be between 0-1
     image = unloader(image)
     plt.imshow(image)
     if title is not None:
@@ -561,9 +562,6 @@ def run_style_transfer(cnn, content_img, style_img, input_img, num_steps=300,
     while run[0] <= num_steps:
 
         def closure():
-            # correct the values of updated input image
-            input_param.data.clamp_(0, 1)
-
             optimizer.zero_grad()
             model(input_param)
             style_score = 0
